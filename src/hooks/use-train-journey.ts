@@ -174,6 +174,19 @@ export function useTrainJourney() {
     }
   }, []);
 
+  const testNotification = async () => {
+    if (typeof window !== "undefined" && "Notification" in window) {
+      await Notification.requestPermission();
+    }
+    if (alarmAudioRef.current) {
+      alarmAudioRef.current.play().catch(e => console.error("Test playback failed:", e));
+      setTimeout(() => {
+        alarmAudioRef.current?.pause();
+        if (alarmAudioRef.current) alarmAudioRef.current.currentTime = 0;
+      }, 2000);
+    }
+  };
+
   return {
     startStation, setStartStation,
     endStation, setEndStation,
@@ -184,6 +197,7 @@ export function useTrainJourney() {
     isAlarmActive,
     startJourney,
     stopJourney,
+    testNotification,
     routeStations,
     alarmStation,
     isWakeLockActive,

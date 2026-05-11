@@ -3,7 +3,7 @@
 import { useTrainJourney } from "@/hooks/use-train-journey";
 import { CHUO_LINE_STATIONS } from "@/lib/stations";
 import { motion, AnimatePresence } from "framer-motion";
-import { Train, Bell, MapPin, Clock, ChevronRight, Speaker } from "lucide-react";
+import { Train, Bell, ChevronRight, Speaker } from "lucide-react";
 import { useState } from "react";
 
 export default function Home() {
@@ -11,99 +11,108 @@ export default function Home() {
   const [accentColor, setAccentColor] = useState("orange");
 
   const colors: Record<string, any> = {
-    orange: { bg: "bg-orange-500", text: "text-orange-500", border: "border-orange-500/20" },
-    blue: { bg: "bg-blue-500", text: "text-blue-500", border: "border-blue-500/20" },
-    purple: { bg: "bg-purple-500", text: "text-purple-500", border: "border-purple-500/20" },
+    orange: { bg: "bg-orange-500", text: "text-orange-500", border: "border-orange-500/20", glow: "shadow-orange-500/20" },
+    blue: { bg: "bg-blue-500", text: "text-blue-500", border: "border-blue-500/20", glow: "shadow-blue-500/20" },
+    purple: { bg: "bg-purple-500", text: "text-purple-500", border: "border-purple-500/20", glow: "shadow-purple-500/20" },
+    teal: { bg: "bg-teal-600", text: "text-teal-600", border: "border-teal-600/20", glow: "shadow-teal-600/20" },
   };
 
   const active = colors[accentColor];
 
   return (
-    <main className="min-h-screen bg-[#050505] text-white font-sans selection:bg-white/20">
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className={`absolute top-[-10%] left-[-10%] w-[40%] h-[40%] ${active.bg}/10 blur-[120px] rounded-full animate-pulse`} />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/5 blur-[120px] rounded-full" />
-      </div>
-
-      <div className="relative z-10 max-w-md mx-auto px-6 pt-12 pb-24">
-        <header className="flex justify-between items-end mb-12">
+    <main className="min-h-screen bg-black text-white font-sans selection:bg-white/10 overflow-x-hidden">
+      <div className="max-w-md mx-auto px-6 pt-16 pb-24">
+        
+        {/* Header */}
+        <header className="flex justify-between items-start mb-10">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <h1 className="text-3xl font-black tracking-tighter">WakeTrain</h1>
-              <span className="text-yellow-400 text-xl animate-pulse">★</span>
-            </div>
-            <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em]">
-              {new Date().toLocaleDateString('ja-JP', { month: 'long', day: 'numeric', weekday: 'short' })}
+            <h1 className="text-4xl font-bold tracking-tight mb-1">TrainAlarm</h1>
+            <p className="text-white/40 text-lg font-medium">
+              {new Date().toLocaleDateString('ja-JP', { month: 'long', day: 'numeric', weekday: 'short' }).replace('(', '（').replace(')', '）')}
             </p>
           </div>
-          <div className="flex gap-2">
-            {Object.keys(colors).map(c => (
-              <button 
-                key={c}
-                onClick={() => setAccentColor(c)}
-                className={`w-4 h-4 rounded-full ${colors[c].bg} ${accentColor === c ? 'ring-2 ring-white ring-offset-2 ring-offset-black' : 'opacity-20'}`}
-              />
-            ))}
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => journey.testNotification()}
+              className="bg-white/5 hover:bg-white/10 text-[10px] font-black tracking-widest px-4 py-2.5 rounded-full border border-white/10 transition-all"
+            >
+              TEST NOTIFY
+            </button>
+            <div className="w-11 h-11 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
+              <Train className={`w-5 h-5 ${active.text}`} />
+            </div>
           </div>
         </header>
+
+        {/* Color Selectors */}
+        <div className="flex justify-center gap-5 mb-12">
+          {Object.keys(colors).map(c => (
+            <button 
+              key={c}
+              onClick={() => setAccentColor(c)}
+              className={`w-8 h-8 rounded-full ${colors[c].bg} ${accentColor === c ? 'ring-2 ring-white ring-offset-4 ring-offset-black' : 'opacity-40'} transition-all`}
+            />
+          ))}
+        </div>
 
         <AnimatePresence mode="wait">
           {!journey.isStarted ? (
             <motion.div
               key="setup"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="space-y-8"
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.02 }}
+              className="space-y-6"
             >
-              <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-8 shadow-2xl backdrop-blur-xl space-y-6">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-white/30 uppercase tracking-widest ml-1">出発駅</label>
-                  <select 
-                    value={journey.startStation?.name || ""} 
-                    onChange={(e) => {
-                      const s = CHUO_LINE_STATIONS.find(st => st.name === e.target.value);
-                      if (s) journey.setStartStation(s);
-                    }}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-xl font-black appearance-none focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
-                  >
-                    <option value="" disabled>駅を選択</option>
-                    {CHUO_LINE_STATIONS.map(s => <option key={s.id} value={s.name} className="bg-[#050505]">{s.name}</option>)}
-                  </select>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-white/30 uppercase tracking-widest ml-1">目的駅</label>
-                  <select 
-                    value={journey.endStation?.name || ""} 
-                    onChange={(e) => {
-                      const s = CHUO_LINE_STATIONS.find(st => st.name === e.target.value);
-                      if (s) journey.setEndStation(s);
-                    }}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-xl font-black appearance-none focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
-                  >
-                    <option value="" disabled>目的地を選択</option>
-                    {CHUO_LINE_STATIONS.map(s => <option key={s.id} value={s.name} className="bg-[#050505]">{s.name}</option>)}
-                  </select>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
+              <div className="bg-[#111] border border-white/5 rounded-[2.5rem] p-8 space-y-8">
+                <div className="grid grid-cols-2 gap-8">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-white/30 uppercase tracking-widest ml-1">発車</label>
+                    <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-1">出発駅</label>
+                    <select 
+                      value={journey.startStation?.name || ""} 
+                      onChange={(e) => {
+                        const s = CHUO_LINE_STATIONS.find(st => st.name === e.target.value);
+                        if (s) journey.setStartStation(s);
+                      }}
+                      className="w-full bg-transparent border-b border-white/10 py-2 text-2xl font-black focus:outline-none focus:border-white/40 transition-all appearance-none"
+                    >
+                      <option value="" disabled>選択</option>
+                      {CHUO_LINE_STATIONS.map(s => <option key={s.id} value={s.name} className="bg-[#111]">{s.name}</option>)}
+                    </select>
+                  </div>
+                  <div className="space-y-2 text-right">
+                    <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] mr-1">目的駅</label>
+                    <select 
+                      value={journey.endStation?.name || ""} 
+                      onChange={(e) => {
+                        const s = CHUO_LINE_STATIONS.find(st => st.name === e.target.value);
+                        if (s) journey.setEndStation(s);
+                      }}
+                      className="w-full bg-transparent border-b border-white/10 py-2 text-2xl font-black text-right focus:outline-none focus:border-white/40 transition-all appearance-none"
+                    >
+                      <option value="" disabled>選択</option>
+                      {CHUO_LINE_STATIONS.map(s => <option key={s.id} value={s.name} className="bg-[#111]">{s.name}</option>)}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-8">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] ml-1">発車時刻</label>
                     <input 
                       type="time" 
                       value={journey.departureTime}
                       onChange={(e) => journey.setDepartureTime(e.target.value)}
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-xl font-black appearance-none focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+                      className="w-full bg-transparent border-b border-white/10 py-2 text-3xl font-black focus:outline-none focus:border-white/40 transition-all"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-white/30 uppercase tracking-widest ml-1">到着</label>
+                  <div className="space-y-2 text-right">
+                    <label className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] mr-1">到着時刻</label>
                     <input 
                       type="time" 
                       value={journey.arrivalTime}
                       onChange={(e) => journey.setArrivalTime(e.target.value)}
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-xl font-black appearance-none focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+                      className={`w-full bg-transparent border-b border-white/10 py-2 text-3xl font-black text-right ${active.text} focus:outline-none focus:border-white/40 transition-all`}
                     />
                   </div>
                 </div>
@@ -111,131 +120,89 @@ export default function Home() {
                 <button 
                   onClick={journey.startJourney}
                   disabled={!journey.startStation || !journey.endStation || !journey.departureTime || !journey.arrivalTime}
-                  className={`w-full py-6 rounded-3xl ${active.bg} text-black font-black text-lg hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-20 shadow-xl shadow-orange-500/20`}
+                  className={`w-full py-6 rounded-3xl bg-white/5 border border-white/10 text-white font-black text-lg hover:bg-white/10 transition-all disabled:opacity-20 active:scale-[0.98]`}
                 >
-                  監視を開始する
+                  SET ALARM
                 </button>
-              </div>
-
-              <div className="bg-white/5 border border-white/10 rounded-3xl p-6 flex gap-4 items-center">
-                <div className="bg-white/10 p-3 rounded-2xl">
-                  <Bell className="w-5 h-5 text-white/60" />
-                </div>
-                <p className="text-xs text-white/40 leading-relaxed font-bold">
-                  目的地の一駅手前で通知を送ります。<br />
-                  <span className="text-white/80">バックグラウンド維持機能</span>を有効にするため、音量を少し上げてください。
-                </p>
               </div>
             </motion.div>
           ) : (
             <motion.div
               key="active"
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.05 }}
-              className="space-y-8"
+              exit={{ opacity: 0, scale: 1.02 }}
+              className="space-y-12"
             >
-              <div className="bg-gradient-to-br from-neutral-900 to-black border border-white/10 rounded-[3rem] p-10 shadow-2xl relative overflow-hidden">
-                <div className={`absolute -top-24 -right-24 w-48 h-48 ${active.bg}/20 rounded-full blur-[80px]`} />
-                
-                <div className="absolute bottom-0 left-0 h-1.5 bg-white/5 w-full" />
+              {/* Main Monitoring Card */}
+              <div className="bg-[#0f0f0f] border border-white/5 rounded-[3rem] p-10 relative overflow-hidden shadow-2xl">
+                <div className="flex justify-between items-center mb-10">
+                  <div className="space-y-1">
+                    <div className="text-5xl font-black tracking-tighter leading-none">{journey.departureTime}</div>
+                    <div className="text-xl font-bold text-white/80">{journey.startStation?.name}</div>
+                    <div className="text-[10px] font-black text-white/20 uppercase tracking-widest">DEPARTURE</div>
+                  </div>
+                  
+                  <div className="w-14 h-14 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
+                    <ChevronRight className={`w-7 h-7 text-white/40`} />
+                  </div>
+
+                  <div className="text-right space-y-1">
+                    <div className={`text-5xl font-black tracking-tighter leading-none ${active.text}`}>{journey.arrivalTime}</div>
+                    <div className="text-xl font-bold text-white/80">{journey.endStation?.name}</div>
+                    <div className="text-[10px] font-black text-white/20 uppercase tracking-widest">ARRIVAL</div>
+                  </div>
+                </div>
+
+                <div className="h-px bg-white/5 w-full mb-10" />
+
+                <div className="text-center space-y-6">
+                  <div className="text-[11px] font-black text-white/30 uppercase tracking-[0.4em]">ESTIMATED ALARM</div>
+                  <div className="flex items-center justify-center gap-5">
+                    <Bell className={`w-10 h-10 ${active.text} animate-pulse`} />
+                    <div className="text-6xl font-black tracking-tighter">{journey.calculatedAlarmTime?.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}</div>
+                  </div>
+                  <div className={`text-sm font-black uppercase tracking-widest ${active.text}`}>
+                    AT {journey.alarmStation?.name} STATION
+                  </div>
+                </div>
+
+                <div className="h-px bg-white/5 w-full mt-10 mb-10" />
+
+                <button 
+                  onClick={journey.stopJourney}
+                  className="w-full py-5 rounded-3xl bg-transparent border border-white/10 text-white font-black text-sm uppercase tracking-widest hover:bg-white/5 transition-all"
+                >
+                  CANCEL ALARM
+                </button>
+
                 <motion.div 
-                  className={`absolute bottom-0 left-0 h-1.5 ${active.bg} shadow-[0_0_20px_rgba(0,0,0,0.5)]`}
+                  className={`absolute bottom-0 left-0 h-1 ${active.bg}`}
                   initial={{ width: 0 }}
                   animate={{ width: `${journey.progress}%` }}
                 />
-
-                <div className="flex justify-between items-start mb-12">
-                  <div className="space-y-1">
-                    <div className="text-4xl font-black tracking-tighter">{journey.departureTime}</div>
-                    <div className="text-lg font-bold text-white/60">{journey.startStation?.name}</div>
-                  </div>
-                  <div className="pt-4 flex flex-col items-center">
-                    <div className="bg-white/5 p-3 rounded-full border border-white/10 mb-2">
-                      <ChevronRight className={`w-6 h-6 ${active.text}`} />
-                    </div>
-                  </div>
-                  <div className="text-right space-y-1">
-                    <div className={`text-4xl font-black tracking-tighter ${active.text}`}>{journey.arrivalTime}</div>
-                    <div className="text-lg font-bold">{journey.endStation?.name}</div>
-                  </div>
-                </div>
-
-                <div className="flex flex-col items-center justify-center py-10 border-y border-white/5 mb-8">
-                  <div className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em] mb-4">通知予定</div>
-                  <div className="text-5xl font-black tracking-tighter flex items-center gap-4">
-                    <Bell className={`w-10 h-10 ${active.text} animate-bounce`} />
-                    {journey.calculatedAlarmTime?.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}
-                  </div>
-                  <div className={`mt-4 px-4 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-black ${active.text}`}>
-                    {journey.alarmStation?.name}駅 通過時
-                  </div>
-                </div>
-
-                <button 
-                  onClick={journey.stopJourney}
-                  className="w-full py-5 rounded-2xl bg-white/5 border border-white/10 text-white/60 font-black text-sm hover:bg-white/10 transition-all active:scale-[0.98]"
-                >
-                  監視を中止する
-                </button>
               </div>
 
-              <div className="flex flex-col items-center gap-4">
-                <div className="flex items-center gap-3 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-full">
-                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                  <span className="text-[10px] font-black text-green-500 uppercase tracking-widest">バックグラウンド維持中</span>
-                  <div className="flex gap-0.5 items-end h-3">
-                    {[0,1,2].map(i => (
-                      <motion.div 
-                        key={i}
-                        animate={{ height: [2, 12, 2] }}
-                        transition={{ repeat: Infinity, duration: 0.6, delay: i * 0.2 }}
-                        className="w-1 bg-green-500/50 rounded-full"
-                      />
-                    ))}
-                  </div>
+              {/* Status Footer */}
+              <div className="flex flex-col items-center gap-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
+                  <span className="text-[11px] font-black text-white/40 uppercase tracking-[0.2em]">MONITORING JOURNEY</span>
                 </div>
-                <p className="text-[10px] text-white/20 font-black text-center max-w-[280px] leading-relaxed uppercase tracking-tighter">
-                  この画面のままポケットに入れてください。<br />
-                  無音オーディオにより、スリープ中もアラームが動作します。
-                </p>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
 
-        <AnimatePresence>
-          {journey.isAlarmActive && (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/90 backdrop-blur-md"
-            >
-              <motion.div 
-                initial={{ scale: 0.9, y: 20 }}
-                animate={{ scale: 1, y: 0 }}
-                className={`w-full max-w-sm p-10 rounded-[3rem] ${active.bg} text-black text-center shadow-[0_0_100px_rgba(0,0,0,0.5)]`}
-              >
-                <motion.div 
-                  animate={{ rotate: [0, 10, -10, 10, -10, 0] }}
-                  transition={{ repeat: Infinity, duration: 0.5 }}
-                  className="flex justify-center mb-6"
-                >
-                  <Bell className="w-24 h-24" />
-                </motion.div>
-                <h2 className="text-4xl font-black mb-4 tracking-tighter">もうすぐ到着！</h2>
-                <p className="font-bold opacity-70 mb-10 text-lg leading-snug">
-                  {journey.alarmStation?.name}駅を通過しました。<br />
-                  次は目的地の{journey.endStation?.name}です。
-                </p>
-                <button 
-                  onClick={journey.stopJourney}
-                  className="w-full py-6 rounded-2xl bg-black text-white font-black text-xl hover:brightness-125 active:scale-95 transition-all"
-                >
-                  了解しました
-                </button>
-              </motion.div>
+                <div className="bg-orange-500/10 border border-orange-500/20 px-6 py-2 rounded-full">
+                  <span className={`text-[10px] font-black uppercase tracking-widest ${active.text}`}>SLEEP PREVENTION ACTIVE</span>
+                </div>
+
+                <div className="text-center space-y-1">
+                  <p className="text-[9px] font-bold text-white/20 uppercase tracking-tighter leading-relaxed">
+                    KEEP THIS TAB OPEN FOR THE MOST RELIABLE ALARM.
+                  </p>
+                  <p className="text-[9px] font-bold text-white/20 uppercase tracking-tighter leading-relaxed">
+                    BACKGROUND NOTIFICATIONS MAY BE DELAYED BY THE OS.
+                  </p>
+                </div>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
