@@ -190,9 +190,21 @@ export default function Home() {
                   <span className="text-[11px] font-black text-white/40 uppercase tracking-[0.2em]">MONITORING JOURNEY</span>
                 </div>
 
-                <div className="bg-orange-500/10 border border-orange-500/20 px-6 py-2 rounded-full">
+                <div className="bg-orange-500/10 border border-orange-500/20 px-6 py-2 rounded-full flex items-center gap-2">
                   <span className={`text-[10px] font-black uppercase tracking-widest ${active.text}`}>SLEEP PREVENTION ACTIVE</span>
                 </div>
+
+                {journey.fcmToken ? (
+                  <div className="flex items-center gap-2 px-3 py-1 bg-green-500/10 rounded-full border border-green-500/20">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                    <span className="text-[10px] font-black text-green-500 uppercase tracking-widest">バックグラウンドプッシュ待機中</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 px-3 py-1 bg-yellow-500/10 rounded-full border border-yellow-500/20">
+                    <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse" />
+                    <span className="text-[10px] font-black text-yellow-500 uppercase tracking-widest">プッシュ通知の設定中...</span>
+                  </div>
+                )}
 
                 <div className="text-center space-y-1">
                   <p className="text-[9px] font-bold text-white/20 uppercase tracking-tighter leading-relaxed">

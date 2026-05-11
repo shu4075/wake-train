@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { Station, CHUO_LINE_STATIONS } from "@/lib/stations";
+import { requestForToken, onMessageListener } from "@/lib/firebase";
 
 export function useTrainJourney() {
   const [startStation, setStartStation] = useState<Station | null>(null);
@@ -11,6 +12,7 @@ export function useTrainJourney() {
   const [isStarted, setIsStarted] = useState(false);
   const [isAlarmActive, setIsAlarmActive] = useState(false);
   const [isWakeLockActive, setIsWakeLockActive] = useState(false);
+  const [fcmToken, setFcmToken] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
   
   const notificationTriggered = useRef(false);
@@ -112,6 +114,20 @@ export function useTrainJourney() {
     }
   }, [alarmStation, endStation]);
 
+  // Request FCM Token on load
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      requestForToken().then((token) => {
+        if (token) setFcmToken(token);
+      });
+
+      onMessageListener().then((payload: any) => {
+        console.log("Foreground message received: ", payload);
+        triggerAlarm();
+      });
+    }
+  }, [triggerAlarm]);
+
   // Timer tick
   useEffect(() => {
     const interval = setInterval(() => {
@@ -158,7 +174,26 @@ export function useTrainJourney() {
     if (silentAudioRef.current) {
       silentAudioRef.current.play().catch(e => console.error("Audio error:", e));
     }
-  }, []);
+
+    // Schedule background notification on server
+    if (fcmToken && calculatedAlarmTime) {
+      try {
+        await fetch("/api/schedule", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            token: fcmToken,
+            alarmTime: calculatedAlarmTime.getTime(),
+            title: "🚆 WakeTrain",
+            body: `${alarmStation?.name || "目的地の1駅前"}を通過しました。次は${endStation?.name}です。`,
+          }),
+        });
+        console.log("Alarm scheduled on server via FCM");
+      } catch (err) {
+        console.error("Failed to schedule alarm on server:", err);
+      }
+    }
+  }, [fcmToken, calculatedAlarmTime, alarmStation, endStation]);
 
   const stopJourney = useCallback(() => {
     setIsStarted(false);
@@ -201,6 +236,7 @@ export function useTrainJourney() {
     routeStations,
     alarmStation,
     isWakeLockActive,
+    fcmToken,
     progress,
   };
 }
