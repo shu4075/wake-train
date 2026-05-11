@@ -1,0 +1,17 @@
+{
+  "name": "WakeTrain",
+  "short_name": "WakeTrain",
+  "description": "中央線寝過ごし防止アラーム",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#050505",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3144/3144467.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
