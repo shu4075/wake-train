@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 0, 0, 0;
-  --background-end-rgb: 0, 0, 0;
+  --foreground-rgb: 17, 24, 39;
+  --background-start-rgb: 255, 255, 255;
+  --background-end-rgb: 255, 255, 255;
 }
 
 body {
@@ -16,8 +16,8 @@ body {
 
 /* Custom styling for time input to match design */
 input[type="time"]::-webkit-calendar-picker-indicator {
-  filter: invert(1);
-  opacity: 0.2;
+  filter: none;
+  opacity: 0.4;
 }
 
 select {
