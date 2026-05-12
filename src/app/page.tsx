@@ -19,25 +19,25 @@ export default function Home() {
   const active = colors[accentColor];
 
   return (
-    <main className="min-h-screen bg-black text-white font-sans selection:bg-white/10 overflow-x-hidden flex flex-col justify-center">
+    <main className="min-h-screen bg-white text-gray-900 font-sans selection:bg-gray-100 overflow-x-hidden flex flex-col justify-center">
       <div className="max-w-md w-full mx-auto px-6 py-12">
         
         {/* Header */}
         <header className="flex justify-between items-start mb-10">
           <div>
-            <h1 className="text-4xl font-bold tracking-tight mb-1">SimpleAlarm</h1>
-            <p className="text-white/40 text-lg font-medium">
+            <h1 className="text-4xl font-bold tracking-tight mb-1 text-gray-900">SimpleAlarm</h1>
+            <p className="text-gray-400 text-lg font-medium">
               {new Date().toLocaleDateString('ja-JP', { month: 'long', day: 'numeric', weekday: 'short' }).replace('(', '（').replace(')', '）')}
             </p>
           </div>
           <div className="flex items-center gap-3">
             <button 
               onClick={() => alarm.testNotification()}
-              className="bg-white/5 hover:bg-white/10 text-[10px] font-black tracking-widest px-4 py-2.5 rounded-full border border-white/10 transition-all"
+              className="bg-gray-100 hover:bg-gray-200 text-gray-600 text-[10px] font-black tracking-widest px-4 py-2.5 rounded-full border border-gray-200 transition-all"
             >
               TEST NOTIFY
             </button>
-            <div className="w-11 h-11 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
+            <div className="w-11 h-11 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center">
               <Bell className={`w-5 h-5 ${active.text}`} />
             </div>
           </div>
@@ -49,7 +49,7 @@ export default function Home() {
             <button 
               key={c}
               onClick={() => setAccentColor(c)}
-              className={`w-8 h-8 rounded-full ${colors[c].bg} ${accentColor === c ? 'ring-2 ring-white ring-offset-4 ring-offset-black' : 'opacity-40'} transition-all`}
+              className={`w-8 h-8 rounded-full ${colors[c].bg} ${accentColor === c ? 'ring-2 ring-gray-700 ring-offset-4 ring-offset-white' : 'opacity-40'} transition-all`}
             />
           ))}
         </div>
@@ -63,22 +63,23 @@ export default function Home() {
               exit={{ opacity: 0, scale: 1.02 }}
               className="space-y-6"
             >
-              <div className="bg-[#111] border border-white/5 rounded-[2.5rem] p-8 space-y-8">
+              <div className="bg-gray-50 border border-gray-100 rounded-[2.5rem] p-8 space-y-8">
                 
                 <div className="space-y-4 text-center">
-                  <label className="text-[12px] font-black text-white/40 uppercase tracking-[0.2em]">通知時間（アラーム）</label>
+                  <label className="text-[12px] font-black text-gray-400 uppercase tracking-[0.2em]">通知時間（アラーム）</label>
                   <input 
                     type="time" 
                     value={alarm.alarmTimeStr}
                     onChange={(e) => alarm.setAlarmTimeStr(e.target.value)}
-                    className={`w-full bg-transparent border-b-2 border-white/10 py-4 text-6xl text-center font-black ${active.text} focus:outline-none focus:border-white/40 transition-all`}
+                    className={`w-full bg-transparent border-b-2 border-gray-200 py-4 text-6xl text-center font-black ${active.text} focus:outline-none focus:border-gray-400 transition-all`}
+                    style={{ colorScheme: 'light' }}
                   />
                 </div>
 
                 <button 
                   onClick={alarm.startAlarm}
                   disabled={!alarm.alarmTimeStr}
-                  className={`w-full py-6 rounded-3xl bg-white/5 border border-white/10 text-white font-black text-xl hover:bg-white/10 transition-all disabled:opacity-20 active:scale-[0.98] mt-8`}
+                  className={`w-full py-6 rounded-3xl bg-gray-900 border border-gray-800 text-white font-black text-xl hover:bg-gray-700 transition-all disabled:opacity-20 active:scale-[0.98] mt-8`}
                 >
                   SET ALARM
                 </button>
@@ -93,21 +94,21 @@ export default function Home() {
               className="space-y-12"
             >
               {/* Main Monitoring Card */}
-              <div className="bg-[#0f0f0f] border border-white/5 rounded-[3rem] p-10 relative overflow-hidden shadow-2xl">
+              <div className="bg-gray-50 border border-gray-100 rounded-[3rem] p-10 relative overflow-hidden shadow-md">
                 
                 <div className="text-center space-y-6 mb-10">
-                  <div className="text-[11px] font-black text-white/30 uppercase tracking-[0.4em]">ALARM TIME</div>
+                  <div className="text-[11px] font-black text-gray-400 uppercase tracking-[0.4em]">ALARM TIME</div>
                   <div className="flex items-center justify-center gap-5">
                     <Bell className={`w-10 h-10 ${active.text} animate-pulse`} />
-                    <div className="text-6xl font-black tracking-tighter">{alarm.calculatedAlarmTime()?.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}</div>
+                    <div className="text-6xl font-black tracking-tighter text-gray-900">{alarm.calculatedAlarmTime()?.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}</div>
                   </div>
                 </div>
 
-                <div className="h-px bg-white/5 w-full mb-10" />
+                <div className="h-px bg-gray-200 w-full mb-10" />
 
                 <button 
                   onClick={alarm.stopAlarm}
-                  className="w-full py-5 rounded-3xl bg-transparent border border-white/10 text-white font-black text-sm uppercase tracking-widest hover:bg-white/5 transition-all"
+                  className="w-full py-5 rounded-3xl bg-transparent border border-gray-200 text-gray-600 font-black text-sm uppercase tracking-widest hover:bg-gray-100 transition-all"
                 >
                   CANCEL ALARM
                 </button>
@@ -117,7 +118,7 @@ export default function Home() {
               <div className="flex flex-col items-center gap-6">
                 <div className="flex items-center gap-3">
                   <div className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse" />
-                  <span className="text-[11px] font-black text-white/40 uppercase tracking-[0.2em]">MONITORING...</span>
+                  <span className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">MONITORING...</span>
                 </div>
 
                 {alarm.fcmToken ? (
@@ -131,10 +132,10 @@ export default function Home() {
                 )}
 
                 <div className="text-center space-y-1 mt-4">
-                  <p className="text-[9px] font-bold text-white/20 uppercase tracking-tighter leading-relaxed">
+                  <p className="text-[9px] font-bold text-gray-300 uppercase tracking-tighter leading-relaxed">
                     アプリを閉じても、時間になれば通知が届きます。
                   </p>
-                  <p className="text-[9px] font-bold text-white/20 uppercase tracking-tighter leading-relaxed">
+                  <p className="text-[9px] font-bold text-gray-300 uppercase tracking-tighter leading-relaxed">
                     ※Safariから「ホーム画面に追加」している場合のみ
                   </p>
                 </div>
